@@ -1,5 +1,6 @@
 val springBootVersion = "2.6.7"
 val lombokVersion = "1.18.24"
+val springUndoVersion = "0.0.1-SNAPSHOT"
 
 ext {
     set("springBootVersion", springBootVersion)
@@ -7,6 +8,21 @@ ext {
 
 subprojects {
     apply(plugin = "java-library")
+    apply(plugin = "maven-publish")
+
+    plugins.withType<MavenPublishPlugin> {
+        extensions.configure<PublishingExtension> {
+            publications {
+                create("maven", MavenPublication::class.java) {
+                    from(components["java"])
+
+                    artifactId = project.name
+                    groupId = "dev.fomenko"
+                    version = springUndoVersion
+                }
+            }
+        }
+    }
 
     plugins.withType<JavaPlugin> {
         extensions.configure<JavaPluginExtension> {
@@ -32,7 +48,6 @@ subprojects {
             tasks.withType<Test> {
                 useJUnitPlatform()
             }
-
         }
     }
 }
