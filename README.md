@@ -3,6 +3,10 @@
 #### Spring Boot starter provides a way to easily implement undo functionality in your Spring Boot application.
 
 ---
+### Features
+ - **Drastically simplifies undo implementation**. Reduces boilerplate that otherwise you need to manage.
+ - **Supports application scaling.** Persist-module can use shared storage between all instances of your application. So you can call undo from any instance.
+ - **Spring-Undo is a Spring Boot Starter**. You don't need to write any additional configuration for setting up Spring-Undo.
 
 ### Usage
 
@@ -57,7 +61,7 @@ class UserController {
 
 ```java
 @RestController
-class UndoController {
+public class UndoController {
     private final Undo undo;
 
     @GetMapping("/undo/{id}")
@@ -67,6 +71,5 @@ class UndoController {
     }
 }
 ```
-
 5. You're done!
 
