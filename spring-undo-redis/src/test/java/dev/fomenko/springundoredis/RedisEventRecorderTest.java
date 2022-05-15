@@ -45,7 +45,7 @@ public class RedisEventRecorderTest {
     public void shouldSaveRecord() {
         // given
         String recordId = "recordId-1";
-        TestActionDto action = new TestActionDto("data1", 43);
+        var action = new TestActionDto("data1", 43);
         ActionRecord<?> record = new ActionRecord<>(recordId, action, fixedTime());
 
         // when
