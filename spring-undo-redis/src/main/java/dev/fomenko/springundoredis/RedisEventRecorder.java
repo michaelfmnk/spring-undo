@@ -31,7 +31,7 @@ public class RedisEventRecorder implements EventRecorder {
             String serializedRecord = serializeRecord(actionRecord);
             stringRedisTemplate.opsForValue().set(KEY_PREFIX + recordId, serializedRecord);
         } catch (IOException e) {
-            throw new RuntimeException("Couldn't serialize an action", e);
+            log.error("Couldn't serialize record", e);
         }
     }
 
