@@ -8,11 +8,11 @@ import java.util.Optional;
 
 public interface EventRecorder {
     @Async
-    void saveEventRecord(String recordId, ActionRecord<?> actionRecord);
+    void saveRecord(ActionRecord<?> actionRecord);
 
     List<ActionRecord<?>> getAllRecords();
 
-    Optional<ActionRecord<?>> getByRecordId(String recordId);
+    Optional<ActionRecord<?>> getRecordById(String recordId);
 
-    boolean deleteByRecordId(String recordId);
+    boolean deleteRecordById(String recordId);
 }

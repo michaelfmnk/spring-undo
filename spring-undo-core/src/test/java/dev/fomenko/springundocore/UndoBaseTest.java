@@ -45,9 +45,9 @@ class UndoBaseTest {
 
     @Test
     void shouldInvokeListeners() {
-        Mockito.when(eventRecorder.deleteByRecordId(Mockito.eq("1"))).thenReturn(true);
+        Mockito.when(eventRecorder.deleteRecordById(Mockito.eq("1"))).thenReturn(true);
         TestDtoA dtoA = new TestDtoA("a");
-        Mockito.when(eventRecorder.getByRecordId(Mockito.eq("1"))).thenReturn(
+        Mockito.when(eventRecorder.getRecordById(Mockito.eq("1"))).thenReturn(
                 Optional.ofNullable(
                         ActionRecord.<TestDtoA>builder()
                                 .expiresAt(LocalDateTime.now())
@@ -68,8 +68,7 @@ class UndoBaseTest {
         undo.publish(action, Duration.ofSeconds(1));
 
         Mockito.verify(eventRecorder, Mockito.times(1))
-                .saveEventRecord(Mockito.eq("eventId"),
-                        Mockito.eq(new ActionRecord<>("eventId", action, LocalDateTime.parse("2019-02-24T09:33:13"))));
+                .saveRecord(Mockito.eq(new ActionRecord<>("eventId", action, LocalDateTime.parse("2019-02-24T09:33:13"))));
     }
 
     @Test

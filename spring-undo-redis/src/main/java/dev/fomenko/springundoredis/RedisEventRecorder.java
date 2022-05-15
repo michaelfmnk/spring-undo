@@ -25,17 +25,18 @@ public class RedisEventRecorder implements EventRecorder {
 
 
     @Override
-    public void save(ActionRecord<?> actionRecord) {
+    public void saveRecord(ActionRecord<?> actionRecord) {
         try {
+            String recordId = actionRecord.getRecordId();
             String serializedRecord = serializeRecord(actionRecord);
-            stringRedisTemplate.opsForValue().set(KEY_PREFIX + actionRecord.getRecordId(), serializedRecord);
+            stringRedisTemplate.opsForValue().set(KEY_PREFIX + recordId, serializedRecord);
         } catch (IOException e) {
             throw new RuntimeException("Couldn't serialize an action", e);
         }
     }
 
     @Override
-    public Optional<ActionRecord<?>> getById(String recordId) {
+    public Optional<ActionRecord<?>> getRecordById(String recordId) {
         String serializedRecord = stringRedisTemplate.opsForValue().get(KEY_PREFIX + recordId);
         if (Objects.isNull(serializedRecord)) {
             return Optional.empty();
@@ -70,7 +71,7 @@ public class RedisEventRecorder implements EventRecorder {
     }
 
     @Override
-    public boolean deleteById(String recordId) {
+    public boolean deleteRecordById(String recordId) {
         return Boolean.TRUE.equals(stringRedisTemplate.delete(KEY_PREFIX + recordId));
     }
 

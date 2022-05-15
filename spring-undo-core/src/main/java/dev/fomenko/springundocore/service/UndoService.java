@@ -32,7 +32,7 @@ public class UndoService {
                 .filter(record -> now.isAfter(record.getExpiresAt()))
                 .collect(Collectors.toList());
         for (ActionRecord<?> record : records) {
-            boolean wasDeleted = eventRecorder.deleteByRecordId(record.getRecordId());
+            boolean wasDeleted = eventRecorder.deleteRecordById(record.getRecordId());
             if (wasDeleted) {
                 invokeListenersForRecord(record, UndoEventListener::onPersist);
             }
@@ -50,13 +50,13 @@ public class UndoService {
                 .expiresAt(expiresAt)
                 .recordId(recordId)
                 .build();
-        eventRecorder.saveEventRecord(recordId, record);
+        eventRecorder.saveRecord(record);
         return recordId;
     }
 
     public void invokeListenerByRecordId(String recordId) {
-        Optional<ActionRecord<?>> recordOptional = eventRecorder.getByRecordId(recordId);
-        boolean wasDeleted = eventRecorder.deleteByRecordId(recordId);
+        Optional<ActionRecord<?>> recordOptional = eventRecorder.getRecordById(recordId);
+        boolean wasDeleted = eventRecorder.deleteRecordById(recordId);
         if (!wasDeleted) {
             return;
         }

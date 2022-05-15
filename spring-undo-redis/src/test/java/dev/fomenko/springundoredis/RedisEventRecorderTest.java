@@ -37,7 +37,7 @@ public class RedisEventRecorderTest {
 
     @AfterEach
     public void afterEach() {
-        stringRedisTemplate.getConnectionFactory().getConnection().flushAll();
+        Objects.requireNonNull(stringRedisTemplate.getConnectionFactory()).getConnection().flushAll();
     }
 
     @Test
@@ -49,7 +49,7 @@ public class RedisEventRecorderTest {
         ActionRecord<?> record = new ActionRecord<>(recordId, action, fixedTime());
 
         // when
-        eventRecorder.saveEventRecord(recordId, record);
+        eventRecorder.saveRecord(record);
 
         // then
         // assert exists
@@ -81,8 +81,8 @@ public class RedisEventRecorderTest {
                 .collect(Collectors.toList());
 
         // when
-        for (int i = 0; i < records.size(); i++) {
-            eventRecorder.saveEventRecord(String.valueOf(i), records.get(i));
+        for (ActionRecord<TestActionDto> testActionDtoActionRecord : records) {
+            eventRecorder.saveRecord(testActionDtoActionRecord);
         }
 
         List<ActionRecord<?>> allRecords = eventRecorder.getAllRecords();
