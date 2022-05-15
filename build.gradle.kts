@@ -24,15 +24,20 @@ subprojects {
         }
     }
 
+    tasks.withType<JavaCompile> {
+        val javaToolchains  = project.extensions.getByType<JavaToolchainService>()
+        javaCompiler.set(
+            javaToolchains.compilerFor {
+                languageVersion.set(JavaLanguageVersion.of(8))
+            }
+        )
+    }
+
     plugins.withType<JavaPlugin> {
         extensions.configure<JavaPluginExtension> {
 
             repositories {
                 mavenCentral()
-            }
-
-            toolchain {
-                version = JavaLanguageVersion.of(8)
             }
 
             dependencies {
