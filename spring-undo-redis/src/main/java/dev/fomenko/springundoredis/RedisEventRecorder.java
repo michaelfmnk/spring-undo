@@ -7,7 +7,6 @@ import dev.fomenko.springundocore.service.EventRecorder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,13 +37,12 @@ public class RedisEventRecorder implements EventRecorder {
     @Override
     public Optional<ActionRecord<?>> getRecordById(String recordId) {
         String serializedRecord = stringRedisTemplate.opsForValue().get(KEY_PREFIX + recordId);
-        if (Objects.isNull(serializedRecord)) {
-            return Optional.empty();
-        }
-        try {
-            return Optional.ofNullable(deserializeRecord(serializedRecord));
-        } catch (IOException e) {
-            log.error("there was an error during serialization", e);
+        if (Objects.nonNull(serializedRecord)) {
+            try {
+                return Optional.ofNullable(deserializeRecord(serializedRecord));
+            } catch (IOException e) {
+                log.error("there was an error during serialization", e);
+            }
         }
         return Optional.empty();
     }
@@ -52,14 +50,12 @@ public class RedisEventRecorder implements EventRecorder {
     @Override
     public List<ActionRecord<?>> getAllRecords() {
         ArrayList<ActionRecord<?>> records = new ArrayList<>();
-
-        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
         Set<String> keys = stringRedisTemplate.keys(KEY_PREFIX + "*");
 
-        if (keys != null) {
+        if (Objects.nonNull(keys)) {
             for (String key : keys) {
                 try {
-                    String serializedRecord = ops.get(key);
+                    String serializedRecord = stringRedisTemplate.opsForValue().get(key);
                     records.add(deserializeRecord(serializedRecord));
                 } catch (ClassCastException | IOException e) {
                     log.error("there was an error during serialization", e);
