@@ -28,7 +28,7 @@ subprojects {
         val javaToolchains  = project.extensions.getByType<JavaToolchainService>()
         javaCompiler.set(
             javaToolchains.compilerFor {
-                languageVersion.set(JavaLanguageVersion.of(8))
+                languageVersion.set(JavaLanguageVersion.of(11))
             }
         )
     }
