@@ -4,29 +4,30 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.fomenko.springundocore.dto.ActionRecord;
 import dev.fomenko.springundocore.service.EventRecorder;
 import lombok.SneakyThrows;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 @SpringBootApplication
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = RedisEventRecorderTestConfiguration.class)
 public class RedisEventRecorderTest {
 
-    private static final String HASH_NAME = "recoverable-actions-hash-name";
+    private static final String PREFIX = "recoverable-action-";
     @Autowired
     private EventRecorder eventRecorder;
     @Autowired
@@ -34,8 +35,8 @@ public class RedisEventRecorderTest {
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
 
-    @After
-    public void prepare() {
+    @AfterEach
+    public void afterEach() {
         stringRedisTemplate.getConnectionFactory().getConnection().flushAll();
     }
 
@@ -51,13 +52,22 @@ public class RedisEventRecorderTest {
         eventRecorder.saveEventRecord(recordId, record);
 
         // then
-        Object objInRedis = stringRedisTemplate.opsForHash().get(HASH_NAME, recordId);
-        RecordEntity<?> recordInRedis = objectMapper.readValue((String) objInRedis, RecordEntity.class);
-        TestActionDto actionInRedis = (TestActionDto) recordInRedis.getAction();
-        Assert.assertEquals(recordId, recordInRedis.getRecordId());
-        Assert.assertEquals(action.getTestData(), actionInRedis.getTestData());
-        Assert.assertEquals(record.getExpiresAt(), recordInRedis.getExpiresAt());
-        Assert.assertEquals(action.getNum(), actionInRedis.getNum());
+        // assert exists
+        Set<String> keys = Objects.requireNonNull(stringRedisTemplate.keys(PREFIX + "*"));
+        Assertions.assertEquals(1, keys.size());
+        Assertions.assertTrue(keys.contains(PREFIX + recordId));
+
+        // assert record
+        String serializedRecord = stringRedisTemplate.opsForValue().get(PREFIX + recordId);
+        Assertions.assertNotNull(serializedRecord);
+        RecordEntity<TestActionDto> recordInRedis = objectMapper.readValue(serializedRecord, RecordEntity.class);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(recordId, recordInRedis.getRecordId()),
+                () -> Assertions.assertEquals(record.getExpiresAt(), recordInRedis.getExpiresAt()),
+                () -> Assertions.assertEquals(action.getTestData(), recordInRedis.getAction().getTestData()),
+                () -> Assertions.assertEquals(action.getNum(), recordInRedis.getAction().getNum())
+        );
     }
 
     @Test
@@ -77,13 +87,13 @@ public class RedisEventRecorderTest {
 
         List<ActionRecord<?>> allRecords = eventRecorder.getAllRecords();
 
-        // them
-        Assert.assertEquals(records.size(), allRecords.size());
+        // then
+        Assertions.assertEquals(records.size(), allRecords.size());
         for (ActionRecord<?> record : allRecords) {
             ActionRecord<?> found = allRecords.stream()
                     .filter(item -> Objects.equals(record.getRecordId(), item.getRecordId()))
                     .findFirst().orElse(null);
-            Assert.assertEquals(found, record);
+            Assertions.assertEquals(found, record);
         }
     }
 

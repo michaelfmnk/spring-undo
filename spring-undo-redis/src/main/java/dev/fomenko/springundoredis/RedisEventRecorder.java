@@ -19,7 +19,7 @@ import java.util.Set;
 @CommonsLog
 @RequiredArgsConstructor
 public class RedisEventRecorder implements EventRecorder {
-    private static final String KEY_PREFIX = "recoverable-actions-hash-name-";
+    private static final String KEY_PREFIX = "recoverable-action-";
     private final StringRedisTemplate stringRedisTemplate;
     private final ObjectMapper objectMapper;
 
