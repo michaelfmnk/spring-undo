@@ -57,4 +57,5 @@ jobs:
           ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.PGP_SECRET }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.PGP_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_buildEnv: github
         run: ./gradlew publish --no-daemon

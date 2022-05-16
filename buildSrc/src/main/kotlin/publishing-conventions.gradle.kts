@@ -56,7 +56,7 @@ publishing {
 }
 
 signing {
-    if (findProperty("build.env") == "github") {
+    if (findProperty("buildEnv") == "github") {
         val signingKey = findProperty("signingKey") as String
         val signingPassword = findProperty("signingPassword") as String
         useInMemoryPgpKeys(signingKey, signingPassword)
