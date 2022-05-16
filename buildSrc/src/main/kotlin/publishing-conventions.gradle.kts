@@ -56,5 +56,10 @@ publishing {
 }
 
 signing {
+    if (findProperty("build.env") == "github") {
+        val signingKey = findProperty("signingKey") as String
+        val signingPassword = findProperty("signingPassword") as String
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
     sign(publishing.publications.getByName("maven"))
 }
