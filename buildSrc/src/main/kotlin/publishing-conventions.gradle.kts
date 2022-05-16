@@ -8,8 +8,8 @@ publishing {
     repositories {
         maven {
             credentials {
-                username = properties["sonatypeUsername"] as String
-                password = properties["sonatypePassword"] as String
+                username = findProperty("sonatypeUsername") as String
+                password = findProperty("sonatypePassword") as String
             }
 
             val releasesRepoUrl =
