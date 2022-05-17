@@ -7,7 +7,7 @@ java {
     withSourcesJar()
     withJavadocJar()
     toolchain {
-        version = "11"
+        languageVersion.set(JavaLanguageVersion.of("11"))
     }
 }
 

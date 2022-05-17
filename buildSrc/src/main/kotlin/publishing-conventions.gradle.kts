@@ -8,8 +8,8 @@ publishing {
     repositories {
         maven {
             credentials {
-                username = properties["usr"] as String
-                password = properties["pwd"] as String
+                username = findProperty("sonatypeUsername") as String
+                password = findProperty("sonatypePassword") as String
             }
 
             val releasesRepoUrl =
@@ -56,5 +56,10 @@ publishing {
 }
 
 signing {
+    if (findProperty("buildEnv") == "github") {
+        val signingKey = findProperty("signingKey") as String
+        val signingPassword = findProperty("signingPassword") as String
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
     sign(publishing.publications.getByName("maven"))
 }
