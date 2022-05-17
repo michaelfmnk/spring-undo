@@ -74,3 +74,6 @@ public class UndoController {
 ```
 5. You're done!
 
+### Contacts
+Message me if you have any questions or suggestions: [michael@fomenko.dev](mailto:michael@fomenko.dev)
+
