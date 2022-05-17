@@ -30,10 +30,10 @@ jobs:
         distribution: 'temurin'
         cache: 'gradle'
     - name: Build with Gradle
-      run: ./gradlew build --no-daemon
       env:
         ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}
         ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+      run: ./gradlew build --no-daemon
 
   publish:
     name: Publish Artifacts
