@@ -1,7 +1,7 @@
-# Spring-Undo
+# Spring-Undo  [![Java CI with Gradle](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml/badge.svg)](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml)
 
 #### Spring Boot starter that provides a way to easily implement undo functionality in your Spring Boot application.
-[![Java CI with Gradle](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml/badge.svg)](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml)
+
 
 ---
 ### Features
