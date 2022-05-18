@@ -32,7 +32,7 @@ or `pom.xml` file:
     <version>0.0.1</version>
 </dependency>
 ```
-2. Create an event dto that will represent that can be undone.
+2. Create a dto that will represent an event that can be undone.
 ```java
 @Data
 @NoArgsConstructor
