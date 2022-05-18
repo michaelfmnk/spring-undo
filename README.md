@@ -1,6 +1,6 @@
 # Spring-Undo
 
-#### Spring Boot starter provides a way to easily implement undo functionality in your Spring Boot application.
+#### Spring Boot starter that provides a way to easily implement undo functionality in your Spring Boot application.
 [![Java CI with Gradle](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml/badge.svg)](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml)
 
 ---
