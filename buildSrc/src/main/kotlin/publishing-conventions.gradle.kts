@@ -24,30 +24,33 @@ publishing {
     publications {
         create("maven", MavenPublication::class.java) {
             from(components["java"])
-
-            pom {
-                name.set(project.name)
-                description.set(project.description)
-
-                scm {
+            afterEvaluate {
+                pom {
+                    packaging = "jar"
+                    name.set(project.name)
+                    description.set(project.description)
                     url.set("https://github.com/michaelfmnk/spring-undo")
-                    connection.set("scm:git:git://github.com/michaelfmnk/spring-undo.git")
-                    developerConnection.set("scm:git:ssh://github.com:michaelfmnk/spring-undo.git")
-                }
 
-                licenses {
-                    license {
-                        name.set("MIT")
-                        url.set("https://opensource.org/licenses/MIT")
+                    scm {
+                        url.set("https://github.com/michaelfmnk/spring-undo")
+                        connection.set("scm:git:git://github.com/michaelfmnk/spring-undo.git")
+                        developerConnection.set("scm:git:ssh://github.com:michaelfmnk/spring-undo.git")
                     }
-                }
 
-                developers {
-                    developer {
-                        name.set("Mykhailo Fomenko")
-                        email.set("michael@fomenko.dev")
-                        url.set("https://fomenko.dev")
-                        roles.addAll("Owner", "Developer")
+                    licenses {
+                        license {
+                            name.set("MIT")
+                            url.set("https://opensource.org/licenses/MIT")
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            name.set("Mykhailo Fomenko")
+                            email.set("michael@fomenko.dev")
+                            url.set("https://fomenko.dev")
+                            roles.addAll("Owner", "Developer")
+                        }
                     }
                 }
             }
