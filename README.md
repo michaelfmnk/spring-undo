@@ -1,4 +1,5 @@
-# Spring-Undo  [![Java CI with Gradle](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml/badge.svg)](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml)
+# Spring-Undo ↩️ 
+[![Java CI with Gradle](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml/badge.svg)](https://github.com/michaelfmnk/spring-undo/actions/workflows/gradle.yml)
 
 #### Spring Boot starter that provides a way to easily implement undo functionality in your Spring Boot application.
 
@@ -11,7 +12,27 @@
 
 ### Usage
 
-1. Create an event dto that will represent that can be undone.
+1. Add the following dependencies in your `build.gradle` file:
+
+```groovy
+implementation 'dev.fomenko:spring-undo-core:v0.0.1'
+implementation 'dev.fomenko:spring-undo-redis:v0.0.1'
+```
+or `pom.xml` file:
+
+```xml
+<dependency>
+    <groupId>dev.fomenko</groupId>
+    <artifactId>spring-undo-core</artifactId>
+    <version>0.0.1</version>
+</dependency>
+<dependency>
+    <groupId>dev.fomenko</groupId>
+    <artifactId>spring-undo-redis</artifactId>
+    <version>0.0.1</version>
+</dependency>
+```
+2. Create an event dto that will represent that can be undone.
 ```java
 @Data
 @NoArgsConstructor
@@ -21,7 +42,7 @@ public class UserRegisteredEvent {
 }
 ```
 
-2. Register an event listener that will be called when either undo timeout is reached or undo is called.
+3. Register an event listener that will be called when either undo timeout is reached or undo is called.
 
 ```java
 @Component
@@ -39,7 +60,7 @@ public static class UserRegisteredUndoEventListener extends UndoEventListener<Us
 }
 ```
 
-3. Autowire `Undo` bean and publish any object that represents an undoable action.
+4. Autowire `Undo` bean and publish any object that represents an undoable action.
 
 ```java
 @RestController
@@ -58,7 +79,7 @@ class UserController {
 }
 ```
 
-4. Create a controller that will undo the action.
+5. Create a controller that will undo the action.
 
 ```java
 @RestController
@@ -72,7 +93,8 @@ public class UndoController {
     }
 }
 ```
-5. You're done!
+
+6. **You're done!** 🎉
 
 ### Contacts
 Message me if you have any questions or suggestions: [michael@fomenko.dev](mailto:michael@fomenko.dev)
