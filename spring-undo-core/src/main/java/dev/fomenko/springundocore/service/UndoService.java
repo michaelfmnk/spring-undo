@@ -1,7 +1,8 @@
 package dev.fomenko.springundocore.service;
 
-import dev.fomenko.springundocore.dto.ActionRecord;
 import dev.fomenko.springundocore.UndoEventListener;
+import dev.fomenko.springundocore.UndoListenerInvocationException;
+import dev.fomenko.springundocore.dto.ActionRecord;
 import dev.fomenko.springundocore.property.UndoProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
@@ -9,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,12 +71,23 @@ public class UndoService {
         Object action = record.getAction();
         List<UndoEventListener<?>> undoEventListeners = listeners.get(action.getClass());
 
-        if (!CollectionUtils.isEmpty(undoEventListeners)) {
-            for (UndoEventListener<?> listener : undoEventListeners) {
-                methodReference.accept((UndoEventListener<? super Object>) listener, action);
-            }
-        } else {
+
+        if (CollectionUtils.isEmpty(undoEventListeners)) {
             log.warn("There are no listeners for " + action.getClass());
+            return;
+        }
+
+        var errors = new ArrayList<Throwable>();
+        for (UndoEventListener<?> listener : undoEventListeners) {
+            try {
+                methodReference.accept((UndoEventListener<? super Object>) listener, action);
+            } catch (Throwable e) {
+                errors.add(e);
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            throw new UndoListenerInvocationException("There were errors while invoking undo listeners", errors);
         }
     }
 }
