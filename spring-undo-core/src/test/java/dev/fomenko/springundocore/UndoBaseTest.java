@@ -1,11 +1,20 @@
 package dev.fomenko.springundocore;
 
 import dev.fomenko.springundocore.config.UndoTestConfiguration;
+import dev.fomenko.springundocore.config.UndoTestConfiguration.FaultyListenerC;
+import dev.fomenko.springundocore.config.UndoTestConfiguration.FirstListenerA;
+import dev.fomenko.springundocore.config.UndoTestConfiguration.FirstListenerB;
+import dev.fomenko.springundocore.config.UndoTestConfiguration.SecondListenerA;
+import dev.fomenko.springundocore.config.UndoTestConfiguration.SecondListenerB;
+import dev.fomenko.springundocore.config.UndoTestConfiguration.SecondListenerC;
+import dev.fomenko.springundocore.config.UndoTestConfiguration.ThirdListenerC;
 import dev.fomenko.springundocore.dto.ActionRecord;
 import dev.fomenko.springundocore.dto.TestDtoA;
+import dev.fomenko.springundocore.dto.TestDtoC;
 import dev.fomenko.springundocore.service.ActionIdGenerator;
 import dev.fomenko.springundocore.service.EventRecorder;
 import dev.fomenko.springundocore.service.UndoService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -35,44 +44,88 @@ class UndoBaseTest {
     @SpyBean
     private ActionIdGenerator idGenerator;
     @SpyBean
-    private UndoTestConfiguration.FirstListenerA firstListenerA;
+    private FirstListenerA firstListenerA;
     @SpyBean
-    private UndoTestConfiguration.SecondListenerA secondListenerA;
+    private SecondListenerA secondListenerA;
     @SpyBean
-    private UndoTestConfiguration.FirstListenerB firstListenerB;
+    private FirstListenerB firstListenerB;
     @SpyBean
-    private UndoTestConfiguration.SecondListenerB secondListenerB;
+    private SecondListenerB secondListenerB;
+    @SpyBean
+    private FaultyListenerC faultyListenerC;
+    @SpyBean
+    private SecondListenerC secondListenerC;
+    @SpyBean
+    private ThirdListenerC thirdListenerB;
 
     @Test
     void shouldInvokeListeners() {
-        Mockito.when(eventRecorder.deleteRecordById(Mockito.eq("1"))).thenReturn(true);
+        // given
         TestDtoA dtoA = new TestDtoA("a");
+        Mockito.when(eventRecorder.deleteRecordById(Mockito.eq("1"))).thenReturn(true);
         Mockito.when(eventRecorder.getRecordById(Mockito.eq("1"))).thenReturn(
                 Optional.ofNullable(
                         ActionRecord.<TestDtoA>builder()
                                 .expiresAt(LocalDateTime.now())
                                 .action(dtoA)
                                 .build()));
-        recordsService.invokeListenerByRecordId("1");
+        // when
+        undo.undo("1");
 
+        // then
         Mockito.verify(firstListenerB, Mockito.never()).onUndo(Mockito.any());
         Mockito.verify(secondListenerB, Mockito.never()).onUndo(Mockito.any());
-        Mockito.verify(firstListenerA, Mockito.times(1)).onUndo(Mockito.eq(dtoA));
-        Mockito.verify(secondListenerA, Mockito.times(1)).onUndo(Mockito.eq(dtoA));
+        Mockito.verify(firstListenerA).onUndo(Mockito.eq(dtoA));
+        Mockito.verify(secondListenerA).onUndo(Mockito.eq(dtoA));
     }
 
     @Test
     void shouldSaveEventWithRecorder() {
+        // given
         TestDtoA action = new TestDtoA("testA");
         Mockito.when(idGenerator.generateId()).thenReturn("eventId");
+
+        // when
         undo.publish(action, Duration.ofSeconds(1));
 
-        Mockito.verify(eventRecorder, Mockito.times(1))
-                .saveRecord(Mockito.eq(new ActionRecord<>("eventId", action, LocalDateTime.parse("2019-02-24T09:33:13"))));
+        // then
+        var expectedRecord = new ActionRecord<>("eventId", action, LocalDateTime.parse("2019-02-24T09:33:13"));
+        Mockito.verify(eventRecorder).saveRecord(Mockito.eq(expectedRecord));
     }
 
     @Test
-    @Disabled
+    void shouldInvokeAllUndoListenersEvenIfOneFails() {
+        // given
+
+        var testDto = new TestDtoC("testA");
+        String eventId = "eventId";
+
+        Mockito.when(idGenerator.generateId()).thenReturn(eventId);
+        Mockito.when(eventRecorder.deleteRecordById(Mockito.eq(eventId))).thenReturn(true);
+        Mockito.when(eventRecorder.getRecordById(Mockito.eq(eventId))).thenReturn(
+                Optional.ofNullable(
+                        ActionRecord.<TestDtoC>builder()
+                                .expiresAt(LocalDateTime.now())
+                                .action(testDto)
+                                .build()));
+
+        // when
+        undo.publish(testDto, Duration.ofSeconds(1));
+        var exception = Assertions.assertThrows(UndoListenerInvocationException.class,
+                () -> undo.undo(eventId));
+
+        // then
+        Assertions.assertEquals(1, exception.getCauses().size());
+
+        var inOrder = Mockito.inOrder(faultyListenerC, secondListenerC, thirdListenerB);
+
+        inOrder.verify(faultyListenerC).onUndo(Mockito.eq(testDto));
+        inOrder.verify(secondListenerC).onUndo(Mockito.eq(testDto));
+        inOrder.verify(thirdListenerB).onUndo(Mockito.eq(testDto));
+    }
+
+    @Test
+    @Disabled("for demo purposes")
     void example() {
         /// user will use only Undo component
 
@@ -85,6 +138,5 @@ class UndoBaseTest {
 
         // then all the listeners being invoked
     }
-
 
 }

@@ -1,6 +1,7 @@
 package dev.fomenko.springundocore.config;
 
 import dev.fomenko.springundocore.UndoEventListener;
+import dev.fomenko.springundocore.dto.TestDtoC;
 import dev.fomenko.springundocore.dto.TestDtoA;
 import dev.fomenko.springundocore.dto.TestDtoB;
 import dev.fomenko.springundocore.service.TimeSupplier;
@@ -8,9 +9,9 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Component;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -26,26 +27,8 @@ public class UndoTestConfiguration {
     }
 
     // action listeners for several events
-    @Bean
-    public FirstListenerA firstA() {
-        return new FirstListenerA();
-    }
 
-    @Bean
-    public SecondListenerA secondA() {
-        return new SecondListenerA();
-    }
-
-    @Bean
-    public FirstListenerB firstB() {
-        return new FirstListenerB();
-    }
-
-    @Bean
-    public SecondListenerB secondB() {
-        return new SecondListenerB();
-    }
-
+    @Component
     public static class FirstListenerA extends UndoEventListener<TestDtoA> {
         @Override
         public void onUndo(TestDtoA action) {
@@ -53,6 +36,7 @@ public class UndoTestConfiguration {
         }
     }
 
+    @Component
     public static class SecondListenerA extends UndoEventListener<TestDtoA> {
         @Override
         public void onUndo(TestDtoA action) {
@@ -60,6 +44,7 @@ public class UndoTestConfiguration {
         }
     }
 
+    @Component
     public static class FirstListenerB extends UndoEventListener<TestDtoB> {
         @Override
         public void onUndo(TestDtoB action) {
@@ -67,6 +52,7 @@ public class UndoTestConfiguration {
         }
     }
 
+    @Component
     public static class SecondListenerB extends UndoEventListener<TestDtoB> {
         @Override
         public void onUndo(TestDtoB action) {
@@ -74,4 +60,27 @@ public class UndoTestConfiguration {
         }
     }
 
+    @Component
+    public static class FaultyListenerC extends UndoEventListener<TestDtoC> {
+        @Override
+        public void onUndo(TestDtoC action) {
+            throw new RuntimeException("FaultyDtoListener");
+        }
+    }
+
+    @Component
+    public static class SecondListenerC extends UndoEventListener<TestDtoC> {
+        @Override
+        public void onUndo(TestDtoC action) {
+            System.err.println("SecondListenerC");
+        }
+    }
+
+    @Component
+    public static class ThirdListenerC extends UndoEventListener<TestDtoC> {
+        @Override
+        public void onUndo(TestDtoC action) {
+            System.err.println("ThirdListenerC");
+        }
+    }
 }
