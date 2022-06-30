@@ -22,13 +22,11 @@ public class MongoEventRecorder implements EventRecorder {
 
     private final MongoTemplate mongoTemplate;
 
-
     @Override
     public void saveRecord(ActionRecord<?> actionRecord) {
         RecordEntity<?> recordEntity = MongoConverter.toEntity(actionRecord);
         mongoTemplate.save(recordEntity, COLLECTION_NAME);
     }
-
 
     @Override
     public List<ActionRecord<?>> getAllRecords() {
@@ -37,7 +35,6 @@ public class MongoEventRecorder implements EventRecorder {
                 .map(MongoConverter::toDto)
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public Optional<ActionRecord<?>> getRecordById(String recordId) {
